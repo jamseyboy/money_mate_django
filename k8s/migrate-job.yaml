@@ -1,0 +1,30 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: money-mate-migrate
+  namespace: money-mate
+spec:
+  template:
+    spec:
+      containers:
+        - name: migrate
+          image: money-mate-app:local
+          command: ["python", "manage.py", "migrate"]
+          envFrom:
+            - configMapRef:
+                name: money-mate-config
+            - secretRef:
+                name: money-mate-secrets
+        - name: cloud-sql-proxy
+          image: gcr.io/cloud-sql-connectors/cloud-sql-proxy:2.11.4
+          args: ["--credentials-file=/secrets/sa-key.json", "moneymate-501413:us-central1:money-mate-db"]
+          volumeMounts:
+            - name: cloudsql-key
+              mountPath: /secrets
+              readOnly: true
+      volumes:
+        - name: cloudsql-key
+          secret:
+            secretName: cloudsql-sa-key
+      restartPolicy: Never
+  backoffLimit: 2

@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: money-mate-svc
+  namespace: money-mate
+spec:
+  selector:
+    app: money-mate-web
+  ports:
+    - port: 80
+      targetPort: 8000
+  type: ClusterIP

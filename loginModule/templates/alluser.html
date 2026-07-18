@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Users</title>
+    <style>
+        /* Modern Color Palette & Typography */
+        :root {
+            --primary: #4F46E5;
+            --bg-color: #F3F4F6;
+            --card-bg: #FFFFFF;
+            --text-main: #111827;
+            --text-muted: #6B7280;
+            --border-color: #E5E7EB;
+            --danger: #EF4444;
+            --danger-hover: #DC2626;
+            --danger-bg: #FEF2F2;
+            --warning: #F59E0B;
+            --warning-hover: #D97706;
+            --success: #10B981;
+            --secondary: #9CA3AF;
+            --secondary-hover: #6B7280;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            padding: 40px 20px;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .header-area {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;
+        }
+
+        h1 { margin: 0; font-size: 24px; }
+        .back-link { text-decoration: none; color: var(--primary); font-weight: 500; font-size: 14px; }
+        .back-link:hover { text-decoration: underline; }
+
+        /* Auth Status Panel */
+        .auth-panel {
+            background-color: #F8FAFC;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 24px;
+        }
+        .status-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+        .status-dot {
+            width: 10px; height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .dot-pending { background-color: var(--warning); }
+        .dot-success { background-color: var(--success); }
+        .dot-error { background-color: var(--danger); }
+
+        .token-display {
+            background-color: #E2E8F0;
+            padding: 10px;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 13px;
+            color: var(--text-muted);
+            word-break: break-all;
+            margin: 0;
+        }
+
+        /* Error Banner */
+        #errorBanner {
+            display: none;
+            background-color: var(--danger-bg);
+            border-left: 4px solid var(--danger);
+            color: var(--danger-hover);
+            padding: 16px;
+            margin-bottom: 24px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* Table Design */
+        table {
+            width: 100%; border-collapse: collapse; background-color: white;
+            border-radius: 8px; overflow: hidden; border: 1px solid var(--border-color);
+        }
+        th, td { padding: 16px; text-align: left; border: 1px solid var(--border-color); }
+        th { background-color: #F9FAFB; color: var(--text-muted); font-weight: 600; font-size: 13px; text-transform: uppercase; }
+        tr:nth-child(even) { background-color: #FAFAFA; }
+        tr:hover { background-color: #F3F4F6; }
+
+        /* Badges */
+        .badge { padding: 4px 12px; border-radius: 9999px; font-size: 12px; font-weight: 600; display: inline-block; }
+        .badge-active { background-color: #DEF7EC; color: #03543F; border: 1px solid #84E1BC; }
+        .badge-inactive { background-color: #F3F4F6; color: #4B5563; border: 1px solid #D1D5DB; }
+
+        /* Buttons */
+        .btn {
+            border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer;
+            font-size: 13px; font-weight: 500; color: white; transition: all 0.2s ease; margin-right: 4px;
+        }
+        .btn-warning { background-color: var(--warning); }
+        .btn-warning:hover { background-color: var(--warning-hover); }
+        .btn-danger { background-color: var(--danger); }
+        .btn-danger:hover { background-color: var(--danger-hover); }
+        .btn-secondary { background-color: var(--secondary); color: white; }
+        .btn-secondary:hover { background-color: var(--secondary-hover); }
+
+        /* Custom Modal Styles */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex; justify-content: center; align-items: center;
+            opacity: 0; visibility: hidden; transition: opacity 0.2s ease, visibility 0.2s ease;
+            z-index: 1000;
+        }
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+        .modal-box {
+            background-color: white; padding: 24px; border-radius: 12px;
+            width: 100%; max-width: 400px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            transform: translateY(-20px); transition: transform 0.2s ease;
+        }
+        .modal-overlay.active .modal-box { transform: translateY(0); }
+        .modal-title { margin: 0 0 10px 0; font-size: 18px; color: var(--text-main); }
+        .modal-message { margin: 0 0 20px 0; font-size: 14px; color: var(--text-muted); line-height: 1.5; }
+        .modal-actions { display: flex; justify-content: flex-end; gap: 10px; }
+        .loading { text-align: center; padding: 40px; color: var(--text-muted); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header-area">
+            <h1>All Users Directory Admin Page</h1>
+            <a href="/api/ninja/hello" class="back-link">← Back to Welcome</a>
+        </div>
+
+        <!-- Auth Status Panel -->
+        <div class="auth-panel" id="authPanel">
+            <div class="status-header">
+                <span id="statusDot" class="status-dot dot-pending"></span>
+                <span id="statusText">Authenticating...</span>
+            </div>
+            <div>
+                <p style="margin: 0 0 4px 0; font-size: 12px; font-weight: 600; color: var(--text-muted);">BEARER TOKEN</p>
+                <div id="tokenString" class="token-display">Fetching...</div>
+            </div>
+        </div>
+
+        <!-- Error message banner -->
+        <div id="errorBanner"></div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="userTableBody">
+                <tr>
+                    <td colspan="6" class="loading">Loading users...</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Custom Modal HTML Structure -->
+    <div id="customModal" class="modal-overlay">
+        <div class="modal-box">
+            <h2 id="modalTitle" class="modal-title">Confirm Action</h2>
+            <p id="modalMessage" class="modal-message">Are you sure you want to proceed?</p>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                <button id="modalConfirmBtn" class="btn">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // OAuth2 Credentials
+        const OAUTH_CONFIG = {
+            clientId: 'bAZ9z7j2CUErYQhIj8AuYgBVoJbBj5dks01chfvQ',
+            clientSecret: 'abizesRnlDk1f3Ke902FDddbxkhy1zQQH2Q7B2MbVJk478r5YPAIXBq7ZF2NEigORefgX2kkBSWFenp7fIN1SLefnTyEV8tHyGurzxOdNPHQu2cCF5hXCFDPEQzFWBuP',
+            tokenUrl: 'http://localhost:8000/o/token/',
+            apiUrl: 'http://localhost:8000/api/oauth2/get_all_users/'
+        };
+
+        // UI Elements for Auth Status
+        const statusDot = document.getElementById('statusDot');
+        const statusText = document.getElementById('statusText');
+        const tokenString = document.getElementById('tokenString');
+
+        // On Page Load: Authenticate and Fetch
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                // 1. Fetch Token
+                const token = await fetchAccessToken();
+
+                // Update UI for successful auth
+                statusDot.className = 'status-dot dot-success';
+                statusText.textContent = 'Status: Authenticated';
+                statusText.style.color = 'var(--success)';
+                tokenString.textContent = token;
+
+                // 2. Fetch Users
+                const users = await fetchUsers(token);
+                renderTable(users);
+
+            } catch (error) {
+                // Update UI for failed auth
+                statusDot.className = 'status-dot dot-error';
+                statusText.textContent = 'Status: Authentication Failed';
+                statusText.style.color = 'var(--danger)';
+                tokenString.textContent = 'N/A';
+
+                showError(error.message);
+                document.getElementById('userTableBody').innerHTML = `
+                    <tr><td colspan="6" style="text-align: center; color: #EF4444; padding: 40px;">Failed to load data. See error above.</td></tr>
+                `;
+            }
+        });
+
+        // Step 1: Generate the Token
+        async function fetchAccessToken() {
+            const bodyParams = new URLSearchParams({
+                grant_type: 'client_credentials',
+                client_id: OAUTH_CONFIG.clientId,
+                client_secret: OAUTH_CONFIG.clientSecret
+            });
+
+            const response = await fetch(OAUTH_CONFIG.tokenUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: bodyParams
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(`Authentication Failed: ${data.error_description || data.error || 'Invalid credentials'}`);
+            }
+
+            return data.access_token;
+        }
+
+        // Step 2: Fetch the Users using the Token
+        async function fetchUsers(token) {
+            const response = await fetch(OAUTH_CONFIG.apiUrl, {
+                method: 'GET',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(`API Access Denied: ${data.detail || data.message || 'Token may be invalid or expired.'}`);
+            }
+
+            return data.data || data;
+        }
+
+        // Step 3: Render the Data Dynamically
+        function renderTable(users) {
+            const tbody = document.getElementById('userTableBody');
+            tbody.innerHTML = '';
+
+            if (!users || users.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #6B7280; padding: 40px;">No users found.</td></tr>';
+                return;
+            }
+
+            users.forEach(user => {
+                const statusBadge = user.is_active
+                    ? '<span class="badge badge-active">Active</span>'
+                    : '<span class="badge badge-inactive">Inactive</span>';
+
+                let actionButtons = '';
+                if (user.is_active) {
+                    actionButtons += `<button class="btn btn-warning" onclick="confirmAction('deactivate', '${user.username}')">Deactivate</button> `;
+                }
+                actionButtons += `<button class="btn btn-danger" onclick="confirmAction('delete', '${user.username}')">Delete</button>`;
+
+                const phoneStr = user.phone ? user.phone : 'N/A';
+
+                tbody.innerHTML += `
+                    <tr>
+                        <td><strong>${user.id}</strong></td>
+                        <td>${user.username}</td>
+                        <td>${user.email}</td>
+                        <td>${phoneStr}</td>
+                        <td>${statusBadge}</td>
+                        <td>${actionButtons}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        // Display Errors
+        function showError(message) {
+            const banner = document.getElementById('errorBanner');
+            banner.textContent = `Error: ${message}`;
+            banner.style.display = 'block';
+        }
+
+        // --- Existing Modal & CSRF Logic Below ---
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        const csrftoken = getCookie('csrftoken');
+
+        const modal = document.getElementById('customModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalMessage = document.getElementById('modalMessage');
+        const modalConfirmBtn = document.getElementById('modalConfirmBtn');
+        let currentAction = null;
+        let currentUsername = null;
+
+        function confirmAction(action, username) {
+            currentAction = action;
+            currentUsername = username;
+
+            if (action === 'deactivate') {
+                modalTitle.textContent = 'Deactivate User';
+                modalMessage.textContent = `Are you sure you want to deactivate ${username}? They will no longer be able to log in.`;
+                modalConfirmBtn.className = 'btn btn-warning';
+                modalConfirmBtn.textContent = 'Yes, Deactivate';
+            } else if (action === 'delete') {
+                modalTitle.textContent = 'Delete User';
+                modalMessage.innerHTML = `Are you sure you want to <strong>permanently delete</strong> ${username}? This cannot be undone.`;
+                modalConfirmBtn.className = 'btn btn-danger';
+                modalConfirmBtn.textContent = 'Yes, Delete';
+            }
+            modal.classList.add('active');
+        }
+
+        function closeModal() {
+            modal.classList.remove('active');
+            currentAction = null;
+            currentUsername = null;
+        }
+
+        modalConfirmBtn.addEventListener('click', function() {
+            if (currentAction === 'deactivate') executeDeactivate(currentUsername);
+            else if (currentAction === 'delete') executeDelete(currentUsername);
+            closeModal();
+        });
+
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) closeModal();
+        });
+
+        function executeDeactivate(username) {
+            fetch('/api/ninja/user/deactivate_user', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrftoken },
+                body: JSON.stringify({ username: username })
+            })
+            .then(response => {
+                if (response.ok) window.location.reload();
+                else alert('Failed to deactivate user.');
+            });
+        }
+
+        function executeDelete(username) {
+            fetch(`/api/ninja/user/remove_user/${username}`, {
+                method: 'DELETE',
+                headers: { 'X-CSRFToken': csrftoken }
+            })
+            .then(response => {
+                if (response.ok) window.location.reload();
+                else alert('Failed to delete user.');
+            });
+        }
+    </script>
+</body>
+</html>

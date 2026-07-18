@@ -1,0 +1,22 @@
+# Virtual environment
+.venv/
+
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Environment variables
+.env
+db.sqlite3
+logs/
+save_logs.sh
+DS_Store
+.idea/
+
+# Logs
+django-debug.log
+*.log
+
+k8s-deployment-guide.md
+cloudsql-key.json
