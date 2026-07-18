@@ -18,5 +18,4 @@ DS_Store
 django-debug.log
 *.log
 
-k8s-deployment-guide.md
 cloudsql-key.json
