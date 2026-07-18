@@ -26,12 +26,6 @@ env = environ.Env(
 # Take environment variables from .env file
 environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
-# --- How it solves your exact problem ---
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
 
 SECRET_KEY = env('SECRET_KEY')
 DEBUG = env.bool('DEBUG', default=False)
@@ -90,17 +84,17 @@ WSGI_APPLICATION = 'money_mate_django.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': env('DATABASE_NAME'),#, default='money_mate_db'),
-        'USER': env('DATABASE_USER'),#, default='money_mate'),
-        'PASSWORD': env('DATABASE_PASSWORD'),#, default='money_mate_password'),
-        'HOST': env('DATABASE_HOST'), # default='localhost'),
-        'PORT': env('DATABASE_PORT'),#, default='5432'),
+        'NAME': env('DATABASE_NAME'),
+        'USER': env('DATABASE_USER'),
+        'PASSWORD': env('DATABASE_PASSWORD'),
+        'HOST': env('DATABASE_HOST'),
+        'PORT': env('DATABASE_PORT'),
     }
 }
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],  # Or your template directories
+        'DIRS': [],
         'APP_DIRS': True,  # This MUST be True for admin to work
         'OPTIONS': {
             'context_processors': [
@@ -133,7 +127,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 AUTH_USER_MODEL = 'loginModule.UserModel'
 
-# Tell Django REST Framework to use OAuth2 Authentication
+# Telling Django REST Framework to use OAuth2 Authentication
 # REST Framework Configuration
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
@@ -145,7 +139,7 @@ REST_FRAMEWORK = {
     ],
 }
 
-# Define the scopes available for your API
+# Defining the scopes available for API
 OAUTH2_PROVIDER = {
     'SCOPES': {
         'read': 'Read access to protected resources',
@@ -155,7 +149,6 @@ OAUTH2_PROVIDER = {
     'ACCESS_TOKEN_EXPIRE_SECONDS': 36000,  # 10 hours
     'REFRESH_TOKEN_EXPIRE_SECONDS': 2592000,  # 30 days
 }
-# settings.py
 
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost:8000',
@@ -178,7 +171,7 @@ USE_TZ = True
 
 
 
-# Redirect after login/logout
+# Redirect after login/logout for admin page
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 
@@ -186,12 +179,7 @@ LOGOUT_REDIRECT_URL = '/'
 ENABLE_LOGGING = env.bool('ENABLE_LOGGING', default=True)
 LOG_LEVEL = env.str('LOG_LEVEL', default='INFO')
 
-import os
-
-ENABLE_LOGGING = env.bool('ENABLE_LOGGING', default=True)
-LOG_LEVEL = env.str('LOG_LEVEL', default='INFO')
-
-# Create a variable for your logs directory to keep the code clean
+# Creating a variable for logs directory to keep the code clean
 LOG_DIR = BASE_DIR / 'logs'
 
 if ENABLE_LOGGING:
@@ -205,10 +193,9 @@ if ENABLE_LOGGING:
             },
         },
         'handlers': {
-            # Point this to the custom class you just built
+            # Pointing this to the custom class for money_mate_django/log_handlers.py
             'dynamic_router': {
                 'level': LOG_LEVEL,
-                # Replace 'money_mate_django' if your project folder is named differently
                 'class': 'money_mate_django.log_handlers.DynamicFileHandler',
                 'log_dir': LOG_DIR,
                 'formatter': 'verbose',
@@ -220,7 +207,7 @@ if ENABLE_LOGGING:
                 'handlers': ['dynamic_router'],
                 'level': LOG_LEVEL,
             },
-            # You can still silence noisy dependencies if you want:
+            # silencing noisy dependencies:
             'django.utils.autoreload': {
                 'level': 'WARNING',
             },
@@ -230,7 +217,6 @@ if ENABLE_LOGGING:
                 'propagate': True,
             },
 
-            # 3. FORCE database queries to propagate
             'django.db.backends': {
                 'handlers': [],
                 'level': LOG_LEVEL,
@@ -245,13 +231,13 @@ else:
         'handlers': {'null': {'class': 'logging.NullHandler'}},
         'loggers': {'': {'handlers': ['null'], 'level': 'CRITICAL'}}
     }
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = 'static/'
 
-# Default primary key field type
-# https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
+
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 

@@ -191,3 +191,8 @@ If you'd rather run the app directly on your machine:
 - **Port already in use**: if `5432` or `8000` is taken on your machine, change the left-hand side of the `ports:` mapping in `docker-compose.yml` (e.g. `"8001:8000"`).
 - **`.env` not picked up**: confirm the file is named exactly `.env` and sits in the same folder as `manage.py` and `docker-compose.yml`.
 - **Changes to code not reflected**: the `web` service mounts the project folder as a volume, so code edits should appear immediately with `runserver`. If running Gunicorn instead, restart the container: `docker compose restart web`.
+
+## 9. Other Domain covered
+
+- **LOGGING**: [See the logging guide](LOGGING_GUIDE.md)
+ 
